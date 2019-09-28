@@ -11,6 +11,22 @@ var requests = {
     get: createRequest('GET', 'query')
 };
 
+// Get a reference to the database service
+var database = firebase.database();
+
+window.onload = function() {
+    test();
+}
+
+function test() {
+    var result;
+    firebase.database().ref('/channelID/EmotesTotemList/1/EmoteImgURL')
+        .once('value').then(function(snapshot) {
+            result = snapshot.val();
+        });
+    console.log(result);
+}
+
 function createRequest(type, method) {
 
     return {

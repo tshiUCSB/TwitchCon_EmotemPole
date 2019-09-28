@@ -11,7 +11,7 @@
       to external libraries. -->
     <script src="jquery-3.3.1.min.js" type="text/javascript"></script>
     <script src="viewer.js" type="text/javascript"></script>
-    
+
     <div id = "boilerplate">
         <h2>Hello, World!</h2>
         <p>Would you care to cycle a color?</p>
@@ -26,13 +26,26 @@
         </div>
     </div>
 
-    <!-- The core Firebase JS SDK is always required and must be listed first -->
-    <script src="/__/firebase/7.0.0/firebase-app.js"></script>
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.0.0/firebase-app.js"></script>
 
     <!-- TODO: Add SDKs for Firebase products that you want to use
          https://firebase.google.com/docs/web/setup#available-libraries -->
 
-    <!-- Initialize Firebase -->
-    <script src="/__/firebase/init.js"></script>
+    <script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyDv6i7nYS6a5D6tz_zTrj5195k0JxGXoo8",
+    authDomain: "twitchcon2019-e9aa5.firebaseapp.com",
+    databaseURL: "https://twitchcon2019-e9aa5.firebaseio.com",
+    projectId: "twitchcon2019-e9aa5",
+    storageBucket: "twitchcon2019-e9aa5.appspot.com",
+    messagingSenderId: "377449298415",
+    appId: "1:377449298415:web:379e88a1629932f5915e1a"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+</script>
+
 </body>
 </html>
