@@ -11,9 +11,13 @@ var requests = {
     get: createRequest('GET', 'query')
 };
 
+var database;
+
 //Initialize emotem function on startup
 window.onload = function() {
-  window.emotem = new emotem();
+  // window.emotem = new emotem();
+  database = firebase.database();
+  additionalTest();
 };
 
 //Firebase Initialization
@@ -50,6 +54,13 @@ emotem.prototype.initFirebase = function() {
 emotem.prototype.test = function() {
     var result;
     this.database.ref('channelID/EmotesTotemList/1/EmoteImgURL')
+        .once('value').then(function(snapshot) {
+            console.log(snapshot.val());
+        });
+}
+
+function additionalTest() {
+    database.ref('channelID/EmotesTotemList/1/EmoteID')
         .once('value').then(function(snapshot) {
             console.log(snapshot.val());
         });
