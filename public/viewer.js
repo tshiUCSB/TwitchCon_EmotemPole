@@ -11,20 +11,48 @@ var requests = {
     get: createRequest('GET', 'query')
 };
 
-// Get a reference to the database service
-var database = firebase.database();
-
+//Initialize emotem function on startup
 window.onload = function() {
-    test();
+  window.emotem = new emotem();
+};
+
+//Firebase Initialization
+function emotem() {
+  this.checkSetup();
+
+  //Shortcuts to DOM elements
+  
+  this.initFirebase();
+  this.test();
 }
 
-function test() {
+// Checks that the Firebase SDK has been correctly setup and configured.
+emotem.prototype.checkSetup = function() {
+  if (!window.firebase || !(firebase.app instanceof Function) || !firebase.app().options) {
+    window.alert('You have not configured and imported the Firebase SDK. ' +
+        'Make sure you go through the codelab setup instructions and make ' +
+        'sure you are running the codelab using `firebase serve`');
+  }
+};
+
+emotem.prototype.initFirebase = function() {
+  //Shortcuts to Firebase SDK features
+  this.database = firebase.database();
+};
+
+// // Get a reference to the database service
+// var database = firebase.database();
+
+// window.onload = function() {
+//     test();
+// }
+
+emotem.prototype.test = function() {
     var result;
-    firebase.database().ref('/channelID/EmotesTotemList/1/EmoteImgURL')
+    this.database.ref('channelID/EmotesTotemList/1/EmoteImgURL')
         .once('value').then(function(snapshot) {
-            result = snapshot.val();
+            console.log(snapshot.val());
         });
-    console.log(result);
 }
 
 function createRequest(type, method) {
