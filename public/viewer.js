@@ -72,16 +72,17 @@ function checkChannel(callback) {
 }
 
 function updateTotem(emotem) {
-    var count = 0;
+    var count2 = 0;
     database.ref(channelID+'/EmotesTotemCount').once('value').then(function(snapshot) {
         if (snapshot.exists()) {
-            count = snapshot.val();
-            console.log("count incremented" + count);
-            count++;
-            database.ref(channelID).update({EmotesTotemCount: count});
+            count2 = snapshot.val();
+            console.log("count incremented" + count2);
+            count2++;
+            
             var updates = {};
-            updates[count-1] = emotem;
+            updates[count2-1] = emotem;
             database.ref(channelID + '/EmotesTotemList').update(updates);
+            //database.ref(channelID).update({EmotesTotemCount: count2});
         }
     })
 }
@@ -91,7 +92,7 @@ function renderTotemCount(channelID) {
         .once('value').then(function(snapshot) {
 
             var count = snapshot.val();
-            console.log(count);
+            console.log("totem height" + count);
             $('#totemHeight').html("Totem Height: " + count);
             
         });
@@ -120,7 +121,7 @@ function populateEmotesTotem(channelID) {
 
 function updateVotingEmotes(channelID) {
   updatedVotingEmotes = true;
-  console.log("updating emotes");
+  console.log("updating votes emotes");
   database.ref(channelID+'/Payload/EmotesIdList')
         .once('value').then(function(snapshot) {
             //Clear the entire list
