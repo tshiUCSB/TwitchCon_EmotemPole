@@ -18,7 +18,7 @@ window.onload = function() {
   // window.emotem = new emotem();
   database = firebase.database();
   populateEmotesTotem(23161357);
-  updateTotemCount(23161357);
+  
   //additionalTest();
 };
 
@@ -68,7 +68,7 @@ function additionalTest() {
         });
 }
 
-function updateTotemCount(channelID) {
+function renderTotemCount(channelID) {
   database.ref(channelID+'/EmotesTotemCount')
         .once('value').then(function(snapshot) {
 
@@ -82,6 +82,9 @@ function updateTotemCount(channelID) {
 function populateEmotesTotem(channelID) {
     database.ref(channelID+'/EmotesTotemList')
         .once('value').then(function(snapshot) {
+            //Clear the entire list
+            $("emoteList").html="";
+            renderTotemCount(channelID);
 
             var EmotesTotem = snapshot.val();
             Object.keys(EmotesTotem).forEach(function (number) {
@@ -95,6 +98,8 @@ function populateEmotesTotem(channelID) {
         });
 
 }
+
+
 function createRequest(type, method) {
 
     return {
