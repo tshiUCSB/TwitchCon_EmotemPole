@@ -73,13 +73,14 @@ function checkChannel(callback) {
 
 function updateTotem(emotem) {
     var count = 0;
-    database.ref(channelID).once('value').then(function(snapshot) {
+    database.ref(channelID+'/EmotesTotemCount').once('value').then(function(snapshot) {
         if (snapshot.exists()) {
-            count = snapshot.val().EmotesTotemCount;
+            count = snapshot.val();
+            console.log("count incremented" + count);
             count++;
-            database.ref(channelID ).update({EmotesTotemCount: count});
+            database.ref(channelID).update({EmotesTotemCount: count});
             var updates = {};
-            updates[count] = emotem;
+            updates[count-1] = emotem;
             database.ref(channelID + '/EmotesTotemList').update(updates);
         }
     })
@@ -118,11 +119,11 @@ function populateEmotesTotem(channelID) {
 }
 
 function updateVotingEmotes(channelID) {
+  updatedVotingEmotes = true;
   console.log("updating emotes");
   database.ref(channelID+'/Payload/EmotesIdList')
         .once('value').then(function(snapshot) {
             //Clear the entire list
-            updatedVotingEmotes = true;
             $("#votingEmotes").empty();
             $('#voteText').html("Vote Now! 10");
             $('#votingEmotes').css("visibility", "visible");
@@ -268,21 +269,23 @@ twitch.onAuthorized(function(auth) {
         //render new emotem list everytime there is an update to the database
         //check if also payload was changed
         database.ref(channelID + '/hasNewPayload').on('value', function(snapshot) {
-          console.log(snapshot.val());
-          if (snapshot.exists() && snapshot.val()) {
-            database.ref(channelID).once('value').then(function(snapshot) {
+          console.log("has new payload " + snapshot.val());
+
+          if (snapshot.val()) {
+            console.log("past the if loop");
+            database.ref(channelID + '/Payload').once('value').then(function(snapshot) {
               var snap = snapshot.val();
               console.log("payload arrived");
               // populateEmotesTotem(channelID);
 
-              if (snap.Payload != null && updatedVotingEmotes == false)
+              if (snap != null && updatedVotingEmotes == false)
               {
                 console.log("payload is not null");
                 $('#votingEmotes').css("visibility", "visible");
                 updateVotingEmotes(channelID);
 
-                if (snap.Payload.Timestamp) {
-                  payloadTimestamp = snap.Payload.Timestamp;
+                if (snap.Timestamp) {
+                  payloadTimestamp = snap.Timestamp;
                   console.log(payloadTimestamp);
                 }
                 
