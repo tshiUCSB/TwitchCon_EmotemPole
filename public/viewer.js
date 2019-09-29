@@ -154,15 +154,17 @@ function updateVotingEmotes(channelID) {
 
                  if (isBroadcaster) {
                   var emoteId = 15598;
-                  checkVoteResult(payloadId);
-                  console.log("max: " + payloadId);
+                  checkVoteResult(function() {
+                    console.log("max: " + payloadId);
 
-                  var newEmotem = {
-                    EmoteID: payloadId,
-                    EmoteImgURL: "https://static-cdn.jtvnw.net/emoticons/v1/" + payloadId + "/2.0",
-                    TimeStamp: payloadTimestamp
-                  };
-                  updateTotem(newEmotem);
+                    var newEmotem = {
+                      EmoteID: payloadId,
+                      EmoteImgURL: "https://static-cdn.jtvnw.net/emoticons/v1/" + payloadId + "/2.0",
+                      TimeStamp: payloadTimestamp
+                    };
+                    updateTotem(newEmotem);
+                  });
+                  
                  }
 
                  populateEmotesTotem(channelID);
@@ -207,12 +209,12 @@ $(document).on("click", ".voteEmotesImg", function(){
 
 });
 
-function checkVoteResult() {
+function checkVoteResult(callback) {
   var maxVote = 0;
   database.ref(channelID + '/Payload/EmotesIdList').once('value').then(function(snapshot) {
     var emoteList = snapshot.val();
     var maxID = emoteList[0].ID;
-    var maxVote = emoteList[0].Votes;
+    maxVote = emoteList[0].Votes;
     for (var i = 1; i < 4; i++) {
       if (emoteList[i].Votes > maxVote) {
         maxID = emoteList[i].ID;
@@ -221,7 +223,8 @@ function checkVoteResult() {
     }
     payloadId = maxID;
     console.log("vote result: " + maxID);
-  })
+    callback();
+  });
 }
 
 function createRequest(type, method) {
