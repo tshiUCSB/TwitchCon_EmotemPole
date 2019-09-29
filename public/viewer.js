@@ -84,6 +84,7 @@ function updateTotem(emotem) {
             database.ref(channelID + '/EmotesTotemList').update(updates);
             //database.ref(channelID).update({EmotesTotemCount: count2});
         }
+        populateEmotesTotem(channelID);
     })
 }
 
@@ -194,9 +195,9 @@ function updateVotingEmotes(channelID) {
 
 
 $(document).on("click", ".voteEmotesImg", function(){
-  console.log("vote");
-  var index = $(this).index(".voteEmotesImg");
-
+  
+  var index = 3-$(this).index(".voteEmotesImg");
+  console.log("vote" + index);
   database.ref(channelID+'/Payload/EmotesIdList/'+index+'/Votes')
         .once('value').then(function(snapshot) {
 
