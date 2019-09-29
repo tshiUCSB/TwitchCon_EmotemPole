@@ -12,10 +12,13 @@ var requests = {
 };
 
 var database;
-var channelID = "";
-var role = "";
+var channelID = "Sun, 29 Sep 2019 14:31:43 GMT";
+var isBroadcaster = false;
 var emotemCount = 0;
 var updatedVotingEmotes = false;
+
+var payloadId = 15598;
+var payloadTimestamp = "";
 
 //Initialize emotem function and database on startup
 window.onload = function() {
@@ -50,9 +53,17 @@ function checkChannel(callback) {
     if (channelID) {
         database.ref(channelID).once('value').then(function(snapshot) {
             if (!snapshot.exists()) {
-                database.ref(channelID).set({
+                database.ref(channelID).update({
                     EmotesTotemCount: 0,
-                    EmotesTotemList: {}
+                    EmotesTotemList: {},
+                    hasNewPayload : false
+                });
+            }
+            else if (!snapshot.val().EmotesTotemCount) {
+              database.ref(channelID).update({
+                    EmotesTotemCount: 0,
+                    EmotesTotemList: {},
+                    hasNewPayload: false
                 });
             }
         });
@@ -92,36 +103,41 @@ function populateEmotesTotem(channelID) {
             $("#emoteList").empty();
             renderTotemCount(channelID);
 
-            var EmotesTotem = snapshot.val();
-            Object.keys(EmotesTotem).forEach(function (number) {
-              //console.log(number); // key
-              //console.log(EmotesTotem[number]); // value
-              //console.log(EmotesTotem[number].EmoteImgURL);
-              $("#emoteList").prepend("<li><img src="+ EmotesTotem[number].EmoteImgURL+" alt=icon class=emote align=center> </li>");
+            if (snapshot.exists()) {
+              var EmotesTotem = snapshot.val();
+              Object.keys(EmotesTotem).forEach(function (number) {
+                //console.log(number); // key
+                //console.log(EmotesTotem[number]); // value
+                //console.log(EmotesTotem[number].EmoteImgURL);
+                $("#emoteList").prepend("<li><img src="+ EmotesTotem[number].EmoteImgURL+" alt=icon class=emote align=center> </li>");
             
             });
-            
+            }
         });
 
 }
 
 function updateVotingEmotes(channelID) {
-  database.ref(channelID+'/Payload/EmotesIDList')
+  console.log("updating emotes");
+  database.ref(channelID+'/Payload/EmotesIdList')
         .once('value').then(function(snapshot) {
             //Clear the entire list
             updatedVotingEmotes = true;
             $("#votingEmotes").empty();
             $('#voteText').html("Vote Now! 10");
+            $('#votingEmotes').css("visibility", "visible");
 
-            var EmotesList = snapshot.val();
-            Object.keys(EmotesList).forEach(function (number) {
-              //console.log(number); // key
-              //console.log(EmotesTotem[number]); // value
-              //console.log(EmotesTotem[number].EmoteImgURL);
-              var imgURL = "https://static-cdn.jtvnw.net/emoticons/v1/"+ EmotesList[number].ID + "/2.0";
-              $("#votingEmotes").prepend("<span class=voteEmotesImg> <img src=" + imgURL + " alt=icon class=emote align=center> </span>");
-            
-            });
+            if (snapshot.exists()) {
+              var EmotesList = snapshot.val();
+              Object.keys(EmotesList).forEach(function (number) {
+                //console.log(number); // key
+                //console.log(EmotesTotem[number]); // value
+                //console.log(EmotesTotem[number].EmoteImgURL);
+                var imgURL = "https://static-cdn.jtvnw.net/emoticons/v1/"+ EmotesList[number].ID + "/2.0";
+                $("#votingEmotes").prepend("<span class=voteEmotesImg> <img src=" + imgURL + " alt=icon class=emote align=center> </span>");
+              
+              });
+          }
             
             //Timer
             var count=10;
@@ -133,10 +149,25 @@ function updateVotingEmotes(channelID) {
               {
                  $('#voteText').html("Vote Now! " + count);
                  clearInterval(counter);
+
+                 if (isBroadcaster) {
+                  var emoteId = 15598;
+                  checkVoteResult(payloadId);
+                  console.log("max: " + payloadId);
+
+                  var newEmotem = {
+                    EmoteID: emoteId,
+                    EmoteImgURL: "https://static-cdn.jtvnw.net/emoticons/v1/" + emoteId + "/2.0",
+                    TimeStamp: payloadTimestamp
+                  };
+                  updateTotem(newEmotem);
+                 }
+
+                 populateEmotesTotem(channelID);
                  //delete the payload
                 
                  updatedVotingEmotes = false;
-                 $('#voteText').html("Voting has ended.");
+                 $('#voteText').html("Waiting for HYPE!");
                  //uncomment next line later
                  $('#votingEmotes').css("visibility", "hidden");
                  
@@ -162,19 +193,33 @@ $(document).on("click", ".voteEmotesImg", function(){
   console.log("vote");
   var index = $(this).index(".voteEmotesImg");
 
-  database.ref(channelID+'/Payload/EmotesIDList/'+index+'/Votes')
+  database.ref(channelID+'/Payload/EmotesIdList/'+index+'/Votes')
         .once('value').then(function(snapshot) {
 
             var votes = snapshot.val();
             console.log("votes" + votes);
             
             votes = votes + 1;
-            database.ref(channelID + '/Payload/EmotesIDList/'+index).update({ Votes: votes });
+            database.ref(channelID + '/Payload/EmotesIdList/'+index).update({ Votes: votes });
         });
 
 });
 
-
+function checkVoteResult() {
+  var maxVote = 0;
+  database.ref(channelID + '/Payload/EmotesIdList').once('value').then(function(snapshot) {
+    var emoteList = snapshot.val();
+    maxID = emoteList[0].ID;
+    maxVote = emoteList[0].Votes;
+    for (var i = 1; i < 4; i++) {
+      if (emoteList[i].Votes > maxVote) {
+        maxID = emoteList[i].ID;
+        maxVote = emoteList[i].Votes;
+      }
+    }
+    console.log("vote result: " + maxID);
+  })
+}
 
 function createRequest(type, method) {
 
@@ -201,34 +246,51 @@ twitch.onAuthorized(function(auth) {
     // save our credentials
     token = auth.token;
     tuid = auth.userId;
+    console.log(tuid);
 
     channelID = auth.channelId;
     console.log(channelID);
-    role = tuid.role;
+
+    if (tuid.substring(1) == channelID) {
+      isBroadcaster = true;
+      console.log("is broadcaster");
+    }
+
     var testEmotem = {
         EmoteID: 12736,
         EmoteImgURL: "https://static-cdn.jtvnw.net/emoticons/v1/12736/2.0",
         TimeStamp: "some random date"
     };
     checkChannel(function() {
-        
+        populateEmotesTotem(channelID);
         //I moved everything from the onWindowLoad here, so once auth is through, then start everything.
         //render new emotem list everytime there is an update to the database
         //check if also payload was changed
-        database.ref('/'+channelID).on('value', (snapshot) => {
-          var snap = snapshot.val();
-          console.log("database changed");
-          populateEmotesTotem(channelID);
+        database.ref(channelID + '/hasNewPayload').on('value', function(snapshot) {
+          console.log(snapshot.val());
+          if (snapshot.exists() && snapshot.val()) {
+            database.ref(channelID).once('value').then(function(snapshot) {
+              var snap = snapshot.val();
+              console.log("payload arrived");
+              // populateEmotesTotem(channelID);
 
-          if (snap['Payload'] != null && updatedVotingEmotes == false)
-          {
-            console.log("payload is not null");
-            $('#votingEmotes').css("visibility", "visible");
-            updateVotingEmotes(channelID);
-            
+              if (snap.Payload != null && updatedVotingEmotes == false)
+              {
+                console.log("payload is not null");
+                $('#votingEmotes').css("visibility", "visible");
+                updateVotingEmotes(channelID);
+
+                payloadTimestamp = snap.Payload.Timestamp;
+                console.log(payloadTimestamp);
+                
+              }
+            });
+
+            database.ref('/' + channelID).update({hasNewPayload: false});
           }
+          
 
-        })
+        });
 
 
               //updateTotem(testEmotem);
