@@ -17,17 +17,19 @@
 
 .extension {
   position: absolute;
-  right: 0px;
+/*  float: right;
+*/right: 0px;
   width: 150px;
   height: 100%;
-}
+/*  overflow-y: auto;
+*/}
 
 .totemArea {
 	height: 80%;
 	text-align: center;
 	border-bottom: 3px solid white;
-	overflow: auto;
 	opacity: .5;
+	overflow-y: hidden;
 }
 
 .totemArea:hover {
@@ -39,11 +41,13 @@
 	text-align: center;
 	position: absolute;
     bottom: 20%;
+    overflow-y: auto;
+    height: 70%;
 }
 
 #totemHeight {
-	position: absolute;
-	top: 0;
+	position: fixed;
+	top: 20px;
 	right: 10px;
 }
 

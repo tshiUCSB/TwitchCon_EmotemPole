@@ -118,11 +118,8 @@ function populateEmotesTotem(channelID) {
             });
             }
         });
-  var lastTotem = document.getElementById('emoteList').lastChild;
-  if (lastTotem) {
-    console.log("scorlling");
-    lastTotem.scrollIntoView();
-  }
+  var totem = document.getElementById('emoteList');
+  totem.scrollIntoView(true);
 }
 
 function updateVotingEmotes(channelID) {
