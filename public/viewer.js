@@ -17,7 +17,9 @@ var database;
 window.onload = function() {
   // window.emotem = new emotem();
   database = firebase.database();
-  additionalTest();
+  populateEmotesTotem(23161357);
+  updateTotemCount(23161357);
+  //additionalTest();
 };
 
 //Firebase Initialization
@@ -66,6 +68,33 @@ function additionalTest() {
         });
 }
 
+function updateTotemCount(channelID) {
+  database.ref(channelID+'/EmotesTotemCount')
+        .once('value').then(function(snapshot) {
+
+            var count = snapshot.val();
+            console.log(count);
+            $('#totemHeight').html("Totem Height: " + count);
+            
+        });
+}
+
+function populateEmotesTotem(channelID) {
+    database.ref(channelID+'/EmotesTotemList')
+        .once('value').then(function(snapshot) {
+
+            var EmotesTotem = snapshot.val();
+            Object.keys(EmotesTotem).forEach(function (number) {
+              //console.log(number); // key
+              //console.log(EmotesTotem[number]); // value
+              //console.log(EmotesTotem[number].EmoteImgURL);
+              $("#emoteList").prepend("<li><img src="+ EmotesTotem[number].EmoteImgURL+" alt=icon class=emote align=center> </li>");
+            
+            });
+            
+        });
+
+}
 function createRequest(type, method) {
 
     return {
