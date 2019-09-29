@@ -17,7 +17,13 @@ var database;
 window.onload = function() {
   // window.emotem = new emotem();
   database = firebase.database();
-  populateEmotesTotem(23161357);
+
+  streamerID = 23161357; //change to the channelID
+  //render new emotem list everytime there is an update to the database
+  database.ref('/'+streamerID).on('value', (snapshot) => {
+    console.log("database changed");
+    populateEmotesTotem(streamerID);
+  })
   
   //additionalTest();
 };
@@ -53,6 +59,8 @@ emotem.prototype.initFirebase = function() {
 //     test();
 // }
 
+
+
 emotem.prototype.test = function() {
     var result;
     this.database.ref('channelID/EmotesTotemList/1/EmoteImgURL')
@@ -83,7 +91,7 @@ function populateEmotesTotem(channelID) {
     database.ref(channelID+'/EmotesTotemList')
         .once('value').then(function(snapshot) {
             //Clear the entire list
-            $("emoteList").html="";
+            $("#emoteList").empty();
             renderTotemCount(channelID);
 
             var EmotesTotem = snapshot.val();

@@ -1,0 +1,82 @@
+{
+  "allowHttpBackend": false,
+  "backendCommand": "node backend -c \"pav5rnkcbbrfukpm0s9pjsqsn6dfvn\" -s \"XM4BaDQ4+8CktDPhW6djmBoP/6t1mSJ/OfR/K8dmFoM=\" -o \"101377322\"",
+  "backendFolderName": "C:\\Users\\jayle\\Documents\\GitHub\\TwitchCon_EmotemPole\\services",
+  "certificateExceptions": [],
+  "extensionViews": [
+    {
+      "id": "1",
+      "label": "",
+      "channelId": "101377322",
+      "configurationAnchor": "video_overlay",
+      "displayChannelName": "tjtheturtleisawesome",
+      "type": "video_overlay",
+      "features": {
+        "isBitsEnabled": false,
+        "isChatEnabled": false,
+        "isSubscriptionStatusAvailable": false
+      },
+      "linked": false,
+      "linkedUserId": "",
+      "mode": "viewer",
+      "isPopout": false,
+      "role": "Broadcaster",
+      "orientation": "Portrait",
+      "frameSize": {
+        "width": 854,
+        "height": 480
+      }
+    }
+  ],
+  "frontendCommand": "",
+  "frontendFolderName": "C:\\Users\\jayle\\Documents\\GitHub\\TwitchCon_EmotemPole\\public",
+  "manifest": {
+    "anchor": "video_overlay",
+    "assetUrls": [],
+    "authorName": "",
+    "bitsEnabled": false,
+    "canInstall": true,
+    "configUrl": "https://localhost:8080/config.html",
+    "configurationLocation": "none",
+    "description": "",
+    "eulaTosUrl": "",
+    "hasChatSupport": false,
+    "iconUrl": "",
+    "iconUrls": {},
+    "id": "pav5rnkcbbrfukpm0s9pjsqsn6dfvn",
+    "installationCount": -42,
+    "liveConfigUrl": "",
+    "name": "EmotemPole-jayleen",
+    "panelHeight": 0,
+    "privacyPolicyUrl": "",
+    "requestIdentityLink": false,
+    "requiredBroadcasterAbilities": [],
+    "screenshotUrls": [],
+    "sku": "",
+    "state": "Testing",
+    "subscriptionsSupportLevel": "none",
+    "summary": "",
+    "supportEmail": "",
+    "vendorCode": "",
+    "version": "0.0.1",
+    "viewerSummary": "",
+    "viewerUrl": "",
+    "viewerUrls": {
+      "videoOverlay": "https://localhost:8080/video_overlay.html"
+    },
+    "views": {
+      "config": {
+        "canLinkExternalContent": false,
+        "viewerUrl": "https://localhost:8080/config.html"
+      },
+      "videoOverlay": {
+        "canLinkExternalContent": false,
+        "viewerUrl": "https://localhost:8080/video_overlay.html"
+      }
+    },
+    "whitelistedConfigUrls": [],
+    "whitelistedPanelUrls": []
+  },
+  "name": "EmotemPole-jayleen",
+  "version": 1
+}
