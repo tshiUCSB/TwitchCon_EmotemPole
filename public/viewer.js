@@ -208,12 +208,8 @@ $(document).on("click", ".voteEmotesImg", function(){
 function checkVoteResult() {
   var maxVote = 0;
   database.ref(channelID + '/Payload/EmotesIdList').once('value').then(function(snapshot) {
-    findMaxID(snapshot.val());
-    
-}
-
-async function findMaxID(emoteList) {
-  var maxID = emoteList[0].ID;
+    var emoteList = snapshot.val();
+    var maxID = emoteList[0].ID;
     var maxVote = emoteList[0].Votes;
     for (var i = 1; i < 4; i++) {
       if (emoteList[i].Votes > maxVote) {
