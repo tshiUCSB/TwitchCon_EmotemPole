@@ -12,6 +12,9 @@ var requests = {
 };
 
 var database;
+var channelID = "";
+var role = "";
+var emotemCount = 0;
 
 //Initialize emotem function on startup
 window.onload = function() {
@@ -25,55 +28,35 @@ window.onload = function() {
     populateEmotesTotem(streamerID);
   })
   
-  //additionalTest();
 };
 
-//Firebase Initialization
-function emotem() {
-  this.checkSetup();
 
-  //Shortcuts to DOM elements
-  
-  this.initFirebase();
-  this.test();
+function checkChannel(callback) {
+    if (channelID) {
+        database.ref(channelID).once('value').then(function(snapshot) {
+            if (!snapshot.exists()) {
+                database.ref(channelID).set({
+                    EmotesTotemCount: 0,
+                    EmotesTotemList: {}
+                });
+            }
+        });
+    }
+    callback();
 }
 
-// Checks that the Firebase SDK has been correctly setup and configured.
-emotem.prototype.checkSetup = function() {
-  if (!window.firebase || !(firebase.app instanceof Function) || !firebase.app().options) {
-    window.alert('You have not configured and imported the Firebase SDK. ' +
-        'Make sure you go through the codelab setup instructions and make ' +
-        'sure you are running the codelab using `firebase serve`');
-  }
-};
-
-emotem.prototype.initFirebase = function() {
-  //Shortcuts to Firebase SDK features
-  this.database = firebase.database();
-};
-
-// // Get a reference to the database service
-// var database = firebase.database();
-
-// window.onload = function() {
-//     test();
-// }
-
-
-
-emotem.prototype.test = function() {
-    var result;
-    this.database.ref('channelID/EmotesTotemList/1/EmoteImgURL')
-        .once('value').then(function(snapshot) {
-            console.log(snapshot.val());
-        });
-}
-
-function additionalTest() {
-    database.ref('channelID/EmotesTotemList/1/EmoteID')
-        .once('value').then(function(snapshot) {
-            console.log(snapshot.val());
-        });
+function updateTotem(emotem) {
+    var count = 0;
+    database.ref(channelID).once('value').then(function(snapshot) {
+        if (snapshot.exists()) {
+            count = snapshot.val().EmotesTotemCount;
+            count++;
+            database.ref(channelID ).update({EmotesTotemCount: count});
+            var updates = {};
+            updates[count] = emotem;
+            database.ref(channelID + '/EmotesTotemList').update(updates);
+        }
+    })
 }
 
 function renderTotemCount(channelID) {
@@ -133,6 +116,18 @@ twitch.onAuthorized(function(auth) {
     // save our credentials
     token = auth.token;
     tuid = auth.userId;
+
+    channelID = auth.channelId;
+    console.log(channelID);
+    role = tuid.role;
+    var testEmotem = {
+        EmoteID: 12736,
+        EmoteImgURL: "https://static-cdn.jtvnw.net/emoticons/v1/12736/2.0",
+        TimeStamp: "some random date"
+    };
+    checkChannel(function() {
+        updateTotem(testEmotem);
+    });
 
     // enable the button
     $('#cycle').removeAttr('disabled');
