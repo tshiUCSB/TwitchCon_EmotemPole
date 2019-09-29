@@ -16,19 +16,33 @@ var channelID = "";
 var role = "";
 var emotemCount = 0;
 
-//Initialize emotem function on startup
+//Initialize emotem function and database on startup
 window.onload = function() {
+  database = firebase.database();
+}
+//Initialize emotem function on startup
+/*window.onload = function() {
   // window.emotem = new emotem();
   database = firebase.database();
 
   streamerID = 23161357; //change to the channelID
+
   //render new emotem list everytime there is an update to the database
+  //check if also payload was changed
   database.ref('/'+streamerID).on('value', (snapshot) => {
+    var snap = snapshot.val();
     console.log("database changed");
     populateEmotesTotem(streamerID);
+
+    if (snap['Payload'] != null)
+    {
+      console.log("payload is not null");
+      updateVotingEmotes(streamerID);
+    }
+
   })
   
-};
+};*/
 
 
 function checkChannel(callback) {
@@ -90,6 +104,64 @@ function populateEmotesTotem(channelID) {
 
 }
 
+function updateVotingEmotes(channelID) {
+  database.ref(channelID+'/Payload/EmotesIDList')
+        .once('value').then(function(snapshot) {
+            //Clear the entire list
+            $("#votingEmotes").empty();
+
+            var EmotesList = snapshot.val();
+            Object.keys(EmotesList).forEach(function (number) {
+              //console.log(number); // key
+              //console.log(EmotesTotem[number]); // value
+              //console.log(EmotesTotem[number].EmoteImgURL);
+              var imgURL = "https://static-cdn.jtvnw.net/emoticons/v1/"+ EmotesList[number].ID + "/2.0";
+              $("#votingEmotes").prepend("<span class=voteEmotesImg> <img src=" + imgURL + " alt=icon class=emote align=center> </span>");
+            
+            });
+            
+            //Timer
+            var count=10;
+
+            var counter=setInterval(function() 
+            {
+              count=count-1;
+              if (count <= 0)
+              {
+                 $('#voteText').html("Vote Now! " + count);
+                 clearInterval(counter);
+                 //delete the payload
+                 //database.ref(channelID+'/Payload').remove();
+                 
+                 return;
+              }
+
+              $('#voteText').html("Vote Now! " + count);
+            }, 1000);
+
+            
+            
+        });
+}
+
+
+$(document).on("click", ".voteEmotesImg", function(){
+  console.log("vote");
+  var index = $(this).index(".voteEmotesImg");
+
+  database.ref(channelID+'/Payload/EmotesIDList/'+index+'/Votes')
+        .once('value').then(function(snapshot) {
+
+            var votes = snapshot.val();
+            console.log("votes" + votes);
+            
+            votes = votes + 1;
+            database.ref(channelID + '/Payload/EmotesIDList/'+index).update({ Votes: votes });
+        });
+
+});
+
+
 
 function createRequest(type, method) {
 
@@ -126,8 +198,25 @@ twitch.onAuthorized(function(auth) {
         TimeStamp: "some random date"
     };
     checkChannel(function() {
-        updateTotem(testEmotem);
-    });
+        //I moved everything from the onWindowLoad here, so once auth is through, then start everything.
+        //render new emotem list everytime there is an update to the database
+        //check if also payload was changed
+        database.ref('/'+channelID).on('value', (snapshot) => {
+          var snap = snapshot.val();
+          console.log("database changed");
+          populateEmotesTotem(channelID);
+
+          if (snap['Payload'] != null)
+          {
+            console.log("payload is not null");
+            updateVotingEmotes(channelID);
+          }
+
+        })
+
+
+              //updateTotem(testEmotem);
+      });
 
     // enable the button
     $('#cycle').removeAttr('disabled');

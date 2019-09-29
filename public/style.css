@@ -47,3 +47,8 @@
 	padding-top: 10px;
 	padding-bottom: 10px;
 }
+
+.voteEmotesImg { 
+	cursor: pointer;
+	padding: 3px;
+}
