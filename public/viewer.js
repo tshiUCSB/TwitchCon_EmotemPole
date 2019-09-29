@@ -12,13 +12,13 @@ var requests = {
 };
 
 var database;
-var channelID = "Sun, 29 Sep 2019 14:31:43 GMT";
+var channelID = "";
 var isBroadcaster = false;
 var emotemCount = 0;
 var updatedVotingEmotes = false;
 
 var payloadId = 15598;
-var payloadTimestamp = "";
+var payloadTimestamp = "Sun, 29 Sep 2019 14:31:43 GMT";
 
 //Initialize emotem function and database on startup
 window.onload = function() {
@@ -156,8 +156,8 @@ function updateVotingEmotes(channelID) {
                   console.log("max: " + payloadId);
 
                   var newEmotem = {
-                    EmoteID: emoteId,
-                    EmoteImgURL: "https://static-cdn.jtvnw.net/emoticons/v1/" + emoteId + "/2.0",
+                    EmoteID: payloadId,
+                    EmoteImgURL: "https://static-cdn.jtvnw.net/emoticons/v1/" + payloadId + "/2.0",
                     TimeStamp: payloadTimestamp
                   };
                   updateTotem(newEmotem);
@@ -208,15 +208,20 @@ $(document).on("click", ".voteEmotesImg", function(){
 function checkVoteResult() {
   var maxVote = 0;
   database.ref(channelID + '/Payload/EmotesIdList').once('value').then(function(snapshot) {
-    var emoteList = snapshot.val();
-    maxID = emoteList[0].ID;
-    maxVote = emoteList[0].Votes;
+    findMaxID(snapshot.val());
+    
+}
+
+async function findMaxID(emoteList) {
+  var maxID = emoteList[0].ID;
+    var maxVote = emoteList[0].Votes;
     for (var i = 1; i < 4; i++) {
       if (emoteList[i].Votes > maxVote) {
         maxID = emoteList[i].ID;
         maxVote = emoteList[i].Votes;
       }
     }
+    payloadId = maxID;
     console.log("vote result: " + maxID);
   })
 }
@@ -280,8 +285,10 @@ twitch.onAuthorized(function(auth) {
                 $('#votingEmotes').css("visibility", "visible");
                 updateVotingEmotes(channelID);
 
-                payloadTimestamp = snap.Payload.Timestamp;
-                console.log(payloadTimestamp);
+                if (snap.Payload.Timestamp) {
+                  payloadTimestamp = snap.Payload.Timestamp;
+                  console.log(payloadTimestamp);
+                }
                 
               }
             });
