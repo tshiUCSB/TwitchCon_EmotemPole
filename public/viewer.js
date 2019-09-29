@@ -112,7 +112,8 @@ function populateEmotesTotem(channelID) {
                 //console.log(number); // key
                 //console.log(EmotesTotem[number]); // value
                 //console.log(EmotesTotem[number].EmoteImgURL);
-                $("#emoteList").prepend("<li><img src="+ EmotesTotem[number].EmoteImgURL+" alt=icon class=emote align=center> </li>");
+                console.log(EmotesTotem[number].TimeStamp);
+                $("#emoteList").prepend("<li><img src="+ EmotesTotem[number].EmoteImgURL+" alt=icon class=emote align=center title=\"" + EmotesTotem[number].TimeStamp + "\"> </li>");
             
             });
             }
@@ -212,16 +213,19 @@ $(document).on("click", ".voteEmotesImg", function(){
 
 function checkVoteResult(callback) {
   var maxVote = 0;
-  database.ref(channelID + '/Payload/EmotesIdList').once('value').then(function(snapshot) {
-    var emoteList = snapshot.val();
+  database.ref(channelID + '/Payload').once('value').then(function(snapshot) {
+    var emoteList = snapshot.val().EmotesIdList;
+    payloadTimestamp = snapshot.val().TimeStamp;
     var maxID = emoteList[0].ID;
     maxVote = emoteList[0].Votes;
     for (var i = 1; i < 4; i++) {
       if (emoteList[i].Votes > maxVote) {
         maxID = emoteList[i].ID;
         maxVote = emoteList[i].Votes;
+        
       }
     }
+
     payloadId = maxID;
     console.log("vote result: " + maxID);
     callback();
@@ -288,11 +292,6 @@ twitch.onAuthorized(function(auth) {
                 console.log("payload is not null");
                 $('#votingEmotes').css("visibility", "visible");
                 updateVotingEmotes(channelID);
-
-                if (snap.Timestamp) {
-                  payloadTimestamp = snap.Timestamp;
-                  console.log(payloadTimestamp);
-                }
                 
               }
             });
