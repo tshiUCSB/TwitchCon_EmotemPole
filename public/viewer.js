@@ -15,6 +15,7 @@ var database;
 var channelID = "";
 var role = "";
 var emotemCount = 0;
+var updatedVotingEmotes = false;
 
 //Initialize emotem function and database on startup
 window.onload = function() {
@@ -108,7 +109,9 @@ function updateVotingEmotes(channelID) {
   database.ref(channelID+'/Payload/EmotesIDList')
         .once('value').then(function(snapshot) {
             //Clear the entire list
+            updatedVotingEmotes = true;
             $("#votingEmotes").empty();
+            $('#voteText').html("Vote Now! 10");
 
             var EmotesList = snapshot.val();
             Object.keys(EmotesList).forEach(function (number) {
@@ -131,7 +134,13 @@ function updateVotingEmotes(channelID) {
                  $('#voteText').html("Vote Now! " + count);
                  clearInterval(counter);
                  //delete the payload
-                 //database.ref(channelID+'/Payload').remove();
+                
+                 updatedVotingEmotes = false;
+                 $('#voteText').html("Voting has ended.");
+                 //uncomment next line later
+                 $('#votingEmotes').css("visibility", "hidden");
+                 database.ref(channelID+'/Payload').remove();
+
                  
                  return;
               }
@@ -198,6 +207,7 @@ twitch.onAuthorized(function(auth) {
         TimeStamp: "some random date"
     };
     checkChannel(function() {
+        
         //I moved everything from the onWindowLoad here, so once auth is through, then start everything.
         //render new emotem list everytime there is an update to the database
         //check if also payload was changed
@@ -206,10 +216,12 @@ twitch.onAuthorized(function(auth) {
           console.log("database changed");
           populateEmotesTotem(channelID);
 
-          if (snap['Payload'] != null)
+          if (snap['Payload'] != null && updatedVotingEmotes == false)
           {
             console.log("payload is not null");
+            $('#votingEmotes').css("visibility", "visible");
             updateVotingEmotes(channelID);
+            
           }
 
         })

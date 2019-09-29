@@ -20,6 +20,7 @@
 .totemArea {
 	height: 80%;
 	text-align: center;
+	border-bottom: 3px solid white;
 }
 
 .totem {
@@ -30,7 +31,6 @@
 }
 
 .votingBox {
-	border-top: 3px solid white;
 	height: 20%;
 	text-align: center;
 }
@@ -51,4 +51,10 @@
 .voteEmotesImg { 
 	cursor: pointer;
 	padding: 3px;
+}
+
+.votingEnded {
+	height: 20%;
+	text-align: center;
+	display: none;
 }
