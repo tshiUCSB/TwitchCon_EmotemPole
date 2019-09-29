@@ -139,7 +139,11 @@ function updateVotingEmotes(channelID) {
                  $('#voteText').html("Voting has ended.");
                  //uncomment next line later
                  $('#votingEmotes').css("visibility", "hidden");
-                 database.ref(channelID+'/Payload').remove();
+                 
+                 //Find the top voters 
+                 
+
+                 //database.ref(channelID+'/Payload').remove();
 
                  
                  return;
